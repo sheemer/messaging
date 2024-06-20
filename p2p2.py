@@ -16,7 +16,7 @@ with open("public_client.pem", "rb") as file:
     content = file.read()
     print(content)
     
-    
+
 #with open("public_server.pem", "rb") as f:
 #    public_key_server = rsa.PublicKey.load_pkcs1(f.read())
 
@@ -24,27 +24,27 @@ with open("public_client.pem", "rb") as file:
 def connect(s):
     while True:
         r_msg = s.recv(1024)
-        decmess = rsa.decrypt(r_msg.decode(),privateKey)
+        decmess = rsa.decrypt(r_msg,privateKey)
 
         if not r_msg:
             break
         if r_msg == '':
             pass
         else:
-            print("Sender:",decmess)
+            print(decmess)
 
 
 def receive(s):
     while True:
-        s_msg = input().replace('b','')
-        encMessage = rsa.encrypt(s_msg.encode(),publickey)
+        s_msg = input().replace('b','').encode()
+        #encMessage = rsa.encrypt(s_msg.encode(),publickey)
         if s_msg == '':
             pass
         #if s_msg.decode() == 'exit':
          #   print("wan exit")
-          #  break
+         #   break
         else:
-            s.sendall(encMessage)
+            s.send(s_msg)
 
 if __name__ == '__main__':
 
@@ -53,7 +53,13 @@ if __name__ == '__main__':
     s.connect((sys.argv[1], int(sys.argv[2])))
     # not working
     #file = open("public_client.pem" , "rb")
-    s.send(content)
+    f = open('public_client.pem','rb')
+    print('Sending...')
+    l = f.read(1024)
+    print(l)
+    s.send(l)
+    
+    
     #--------------------------------------------------------------------------
     thread1 = threading.Thread(target = connect, args = ([s]))
     thread2 = threading.Thread(target = receive, args = ([s]))
