@@ -2,12 +2,24 @@ import sys
 import socket
 import threading
 import rsa
+from getpass import getpass
+import os
+import base64
+
+os.system("clear || cls")
+with open("picsnail", 'r') as login:
+    sl = login.read()
+print(sl)
+print("snailchat")
 
 
-publicKey, privateKey = rsa.newkeys(2048)
+publicKey, privateKey = rsa.newkeys(512)
 
 with open("pubkey_master.pem", "wb") as f:
     f.write(publicKey.save_pkcs1("PEM"))
+    
+    
+
     
 def connect(conn):
     while True:
@@ -17,7 +29,8 @@ def connect(conn):
             pass
         else:
             decmess = rsa.decrypt(received, privateKey)
-            print(decmess)
+            msgde = str(decmess).replace("b'" , "")
+            print(name1[:-1], msgde[:-1])
 
 def sendMsg(conn):
     while True:
@@ -27,20 +40,23 @@ def sendMsg(conn):
             pass
         else:
             conn.send(encMessage)
-
+                      
 if __name__ == '__main__':
-    password = input('Please enter chat password: ')
+    password = getpass('Please enter chat password: ')
+    
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(('192.168.1.248', 12345))
     s.listen(5)
+    print("Wait for a connection.")
     (conn, addr) = s.accept() 
     print ('Got connection from: ', addr)
     
     
     #Checking If passwords match.
-    clientpws = conn.recv(1024).decode()
-    if password == clientpws:
+    clientpws = conn.recv(1024)
+    decodepws = base64.b64decode(clientpws).decode()
+    if password == decodepws:
         print("Client password success. Happy chatting!")
         pass
     else: 
@@ -61,9 +77,12 @@ if __name__ == '__main__':
     t = open("pubkey_master.pem",'rb')
     p = t.read(1024)
     conn.send(p)
- 
     
-
+    username =input("Please input your username:").replace("b'", '').encode()
+    conn.send(username)
+    
+    name = conn.recv(1024)
+    name1 = str(name).replace("b'" ,"" )
     
     
     

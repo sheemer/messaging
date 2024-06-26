@@ -1,12 +1,21 @@
 import sys
 import socket
 import threading
-
+from getpass import getpass
 import rsa  
+import os
+import base64 
 
-# Need security
+os.system("clear || cls")
 
-publickey, privateKey = rsa.newkeys(2048)
+with open("picsnail", 'r') as login:
+    sl = login.read()
+print(sl)
+print("snailchat")
+
+
+
+publickey, privateKey = rsa.newkeys(512)
 
 
 with open("public_client.pem", "wb") as f:
@@ -14,6 +23,8 @@ with open("public_client.pem", "wb") as f:
     
 with open("public_client.pem", "rb") as file:
     content = file.read()
+    
+
   
 def connect(s):
     while True:
@@ -25,7 +36,8 @@ def connect(s):
         if r_msg == '':
             pass
         else:
-            print(decmess)
+            msgde = str(decmess).replace("b'" , "")
+            print(name1[:-1], msgde[:-1])
 
 
 def receive(s):
@@ -38,14 +50,18 @@ def receive(s):
             s.send(encMessage)
 
 if __name__ == '__main__':
-
+   
+    
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.connect((sys.argv[1], int(sys.argv[2])))
     
     #Password to send to the server.
-    password = input("Please enter chat password:  ").encode()
-    s.send(password)
+    
+    password = getpass("Please enter chat password:  ").encode()
+    codedpass = base64.b64encode(password)
+    s.send(codedpass)
+    
    
    
    #Client sending PUBKEY
@@ -53,6 +69,7 @@ if __name__ == '__main__':
     l = f.read(1024)
     s.send(l)
     
+
     
     #Client recieving the MASTERPUBKEY
     t = open("pubkey_master.pem",'wb')
@@ -60,7 +77,15 @@ if __name__ == '__main__':
     t.write(p)
     t.close() 
     masterkeypub = rsa.PublicKey.load_pkcs1(p)
+
     
+    username =input("Please input your username:").replace("b'", '').encode()
+    s.send(username)
+    name = s.recv(1024)
+    name1 = str(name).replace("b'", '')
+       
+    
+    print("Connection to office successful. Safe sending!")
     #--------------------------------------------------------------------------
     thread1 = threading.Thread(target = connect, args = ([s]))
     thread2 = threading.Thread(target = receive, args = ([s]))
