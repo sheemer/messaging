@@ -2,9 +2,10 @@ import sys
 import socket
 import threading
 import rsa
-from getpass import getpass
+from getpass4 import getpass
 import os
 import base64
+
 
 os.system("clear || cls")
 with open("picsnail", 'r') as login:
@@ -13,7 +14,7 @@ print(sl)
 print("snailchat")
 
 
-publicKey, privateKey = rsa.newkeys(512)
+publicKey, privateKey = rsa.newkeys(4096)
 
 with open("pubkey_master.pem", "wb") as f:
     f.write(publicKey.save_pkcs1("PEM"))
@@ -43,11 +44,14 @@ def sendMsg(conn):
                       
 if __name__ == '__main__':
     password = getpass('Please enter chat password: ')
-    
+    hostname = socket.gethostname()
+    IPAddr = socket.gethostbyname(hostname)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('192.168.1.248', 12345))
+    s.bind(("0.0.0.0", 12345))
     s.listen(5)
+    print("Your Computer Name is:" + hostname)
+    print("Your Computer IP Address is:" + IPAddr)
     print("Wait for a connection.")
     (conn, addr) = s.accept() 
     print ('Got connection from: ', addr)
