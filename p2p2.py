@@ -15,6 +15,8 @@ print("snailchat")
 
 
 
+print("Making keys please feel free to grab coffee!")
+
 publickey, privateKey = rsa.newkeys(512)
 
 
