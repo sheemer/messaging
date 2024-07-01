@@ -17,7 +17,7 @@ print("snailchat")
 
 print("Making keys please feel free to grab coffee!")
 
-publickey, privateKey = rsa.newkeys(512)
+publickey, privateKey = rsa.newkeys(4096)
 
 
 with open("public_client.pem", "wb") as f:
