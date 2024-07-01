@@ -13,6 +13,8 @@ with open("picsnail", 'r') as login:
 print(sl)
 print("snailchat")
 
+print("Making keys please feel free to grab coffee!")
+
 
 publicKey, privateKey = rsa.newkeys(4096)
 
